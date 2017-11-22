@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 namespace DPINT_Wk3_Observer.Model
 {
-    public class Baggageband
+    public class Baggageband : Observable<Baggageband>
     {
         public string Naam { get; set; }
         private int _aantalKoffersPerMinuut;
@@ -38,6 +38,7 @@ namespace DPINT_Wk3_Observer.Model
 
             _huidigeVluchtTimer.Start();
 
+            Notify();
             // TODO: We moeten het laten weten dat we een update hebben!
         }
 
@@ -45,13 +46,22 @@ namespace DPINT_Wk3_Observer.Model
         {
             AantalKoffers--;
 
-            if(AantalKoffers == 0)
+            if (AantalKoffers == 0)
             {
                 VluchtVertrokkenVanuit = null;
                 _huidigeVluchtTimer.Stop();
             }
 
+            Notify();
             // TODO: We moeten het laten weten dat we een update hebben!
+        }
+
+        protected override void Notify()
+        {
+            foreach (IObserver<Baggageband> observer in ObserverList)
+            {
+                observer.OnNext(this);
+            }
         }
     }
 }
